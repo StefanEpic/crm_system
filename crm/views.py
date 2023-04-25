@@ -1,7 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
-from django.views.generic import TemplateView, UpdateView, DeleteView
+from django.views.generic import TemplateView, UpdateView, DeleteView, CreateView
 
 from .forms import TaskForm
 from .models import Task, Project, Employee
@@ -19,6 +19,7 @@ class MainView(LoginRequiredMixin, TemplateView):
         context['doing'] = do_dict(task.objects.filter(status='DO').order_by('end', 'priority'))
         context['done'] = do_dict(task.objects.filter(status='DN').order_by('end', 'priority'))
         context['release'] = do_dict(task.objects.filter(status='RL').order_by('end', 'priority'))
+        context['user_pk'] = self.request.user.pk
         return context
 
 
@@ -35,6 +36,7 @@ class ProjectView(LoginRequiredMixin, TemplateView):
         context['done'] = do_dict(task.objects.filter(status='DN', project=project).order_by('end', 'priority'))
         context['release'] = do_dict(task.objects.filter(status='RL', project=project).order_by('end', 'priority'))
         context['projectname'] = project
+        context['user_pk'] = self.request.user.pk
         return context
 
 
@@ -51,14 +53,27 @@ class EmployeeView(LoginRequiredMixin, TemplateView):
         context['done'] = do_dict(task.objects.filter(status='DN', employee=employee).order_by('end', 'priority'))
         context['release'] = do_dict(task.objects.filter(status='RL', employee=employee).order_by('end', 'priority'))
         context['employeename'] = employee
+        context['user_pk'] = self.request.user.pk
         return context
+
+
+class TaskCreate(LoginRequiredMixin, CreateView):
+    form_class = TaskForm
+    model = Task
+    template_name = 'task_create.html'
+    success_url = reverse_lazy('kanban_page')
+
+    def form_valid(self, form):
+        task = form.save(commit=False)
+        task.author_id = int(self.request.user.pk)
+        return super().form_valid(form)
 
 
 class TaskUpdate(LoginRequiredMixin, TestIsAuthorThisTask, UpdateView):
     form_class = TaskForm
     model = Task
-    template_name = 'task_edit.html'
-    reverse_lazy('kanban_page')
+    template_name = 'task_create.html'
+    success_url = reverse_lazy('kanban_page')
 
 
 class TaskDelete(LoginRequiredMixin, TestIsAuthorThisTask, DeleteView):
@@ -67,3 +82,31 @@ class TaskDelete(LoginRequiredMixin, TestIsAuthorThisTask, DeleteView):
 
     def get(self, request, *args, **kwargs):
         return self.delete(request, *args, **kwargs)
+
+
+def transfer_to_todo(request, pk):
+    task = Task.objects.get(id=pk)
+    task.status = 'TD'
+    task.save(update_fields=['status'])
+    return redirect(request.META.get('HTTP_REFERER'))
+
+
+def transfer_to_doing(request, pk):
+    task = Task.objects.get(id=pk)
+    task.status = 'DO'
+    task.save(update_fields=['status'])
+    return redirect(request.META.get('HTTP_REFERER'))
+
+
+def transfer_to_done(request, pk):
+    task = Task.objects.get(id=pk)
+    task.status = 'DN'
+    task.save(update_fields=['status'])
+    return redirect(request.META.get('HTTP_REFERER'))
+
+
+def transfer_to_release(request, pk):
+    task = Task.objects.get(id=pk)
+    task.status = 'RL'
+    task.save(update_fields=['status'])
+    return redirect(request.META.get('HTTP_REFERER'))

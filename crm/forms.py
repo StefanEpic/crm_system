@@ -11,6 +11,7 @@ class TaskForm(forms.ModelForm):
             'project',
             'employee',
             'status',
-            'start',
+            'priority',
             'end',
         ]
+

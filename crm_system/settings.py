@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'crm',
     'django_filters',
+    'widget_tweaks',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
