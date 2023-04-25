@@ -1,0 +1,338 @@
+{% extends 'default.html' %}
+
+{% block title %}
+Главная
+{% endblock title %}
+
+{% block content %}
+    <!-- Layout wrapper -->
+    <div class="layout-wrapper layout-content-navbar">
+      <div class="layout-container">
+
+        <!-- Layout container -->
+        <div class="layout-page">
+
+          <!-- Content wrapper -->
+          <div class="content-wrapper">
+            <!-- Content -->
+
+            <div class="container-xxl flex-grow-1 container-p-y">
+              {% if projectname %}
+                <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">ИТИС / <a class="text-muted fw-light" href="/">Канбан</a> /</span>{{ projectname }}</h4>
+              {% elif employeename %}
+                <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">ИТИС / <a class="text-muted fw-light" href="/">Канбан</a> /</span>{{ employeename }}</h4>
+              {% else %}
+                <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">ИТИС /</span> Канбан</h4>
+              {% endif %}
+
+              <!-- Content types -->
+
+              <div class="row mb-5">
+                <!-- TodoCol -->
+                <div class="col-md-6 col-lg-3">
+                  <h5 class="mt-2">Запланировано</h5>
+                  <div class="accordion mt-4 accordion-without-arrow" id="todo">
+
+                    {% for date, tasks in todo.items %}
+                      <h6 class="mt-2 text-muted">{{ date }}</h6>
+                      {% for task in tasks %}
+                        <div class="card accordion-item">
+                          <h2 class="accordion-header text-body d-flex justify-content-between" id="heading{{ task.pk }}">
+                            <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#accordion{{ task.pk }}" aria-expanded="false" aria-controls="accordion{{ task.pk }}">
+                              {% if task.priority == 3 %}
+                                <span class="badge badge-center bg-success">3</span>
+                              {% elif task.priority == 2 %}
+                                <span class="badge badge-center bg-warning">2</span>
+                              {% elif task.priority == 1 %}
+                                <span class="badge badge-center bg-danger">1</span>
+                              {% endif %}
+                              {{ task.name }}
+                            </button>
+                          </h2>
+                          <div id="accordion{{ task.pk }}" class="accordion-collapse collapse" data-bs-parent="#todo" style="">
+                            <div class="accordion-body">
+                              <p class="card-text">
+                                {% for project in task.project.all %}
+                                  <a class="text-muted" href="{% url 'kanban_project_page' project.id %}">{{ project }}</a>&nbsp&nbsp&nbsp&nbsp
+                                {% endfor %}
+                              </p>
+                              <p class="card-text">
+                                {{ task.about|truncatewords:20 }}
+                              </p>
+                              <p class="card-text">
+                                <ul class="list-unstyled users-list m-0 avatar-group d-flex align-items-center">
+                                {% for employee in task.employee.all %}
+                                  <li data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="top" class="avatar avatar-xs pull-up" title="" data-bs-original-title="{{ employee }}">
+                                    <a href="{% url 'kanban_employee_page' employee.id %}">
+                                    {% if employee.photo %}
+                                      <img src="{{ MEDIA_DIR }}{{ employee.photo.url }}" alt="Avatar" class="rounded-circle">
+                                    {% else %}
+                                      <img src="/media/photos_of_employees/default.png" alt="Avatar" class="rounded-circle">
+                                    {% endif %}
+                                    </a>
+                                  </li>
+                                {% endfor %}
+                                </ul>
+                              </p>
+                              <div class="btn-group" role="group" aria-label="First group">
+                                  <button type="button" class="btn btn-outline-secondary">
+                                    <i class="tf-icons bx bx-bulb"></i>
+                                  </button>
+                                  <button type="button" class="btn btn-outline-secondary">
+                                    <i class="tf-icons bx bx-comment-dots"></i>
+                                  </button>
+                                  <button type="button" class="btn btn-outline-secondary">
+                                    <i class="tf-icons bx bx-task"></i>
+                                  </button>
+                                  <button type="button" class="btn btn-outline-secondary">
+                                    <i class="tf-icons bx bx-rocket"></i>
+                                  </button>
+                              </div>
+                                <p></p>
+                                <button type="button" class="btn btn-sm btn-primary" onclick="document.location='{{ task.pk }}/edit'">Редактировать</button>
+                                <button type="button" class="btn btn-sm btn-primary" onclick="document.location='{{ task.pk }}/delete'">Удалить</button>
+                            </div>
+                          </div>
+                    </div>
+                      {% endfor %}
+                    {% endfor %}
+
+                  </div>
+                </div>
+                <!-- DoingCol -->
+                <div class="col-md-6 col-lg-3">
+                  <h5 class="mt-2">В работе</h5>
+                  <div class="accordion mt-4 accordion-without-arrow" id="doing">
+
+                    {% for date, tasks in doing.items %}
+                      <h6 class="mt-2 text-muted">{{ date }}</h6>
+                      {% for task in tasks %}
+                        <div class="card accordion-item">
+                          <h2 class="accordion-header" id="heading{{ task.pk }}">
+                            <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#accordion{{ task.pk }}" aria-expanded="false" aria-controls="accordion{{ task.pk }}">
+                              {% if task.priority == 3 %}
+                                <span class="badge badge-center bg-success">3</span>
+                              {% elif task.priority == 2 %}
+                                <span class="badge badge-center bg-warning">2</span>
+                              {% elif task.priority == 1 %}
+                                <span class="badge badge-center bg-danger">1</span>
+                              {% endif %}
+                              {{ task.name }}
+                            </button>
+                          </h2>
+                          <div id="accordion{{ task.pk }}" class="accordion-collapse collapse" data-bs-parent="#doing" style="">
+                            <div class="accordion-body">
+                              <p class="card-text">
+                                {% for project in task.project.all %}
+                                  <a class="text-muted" href="{% url 'kanban_project_page' project.id %}">{{ project }}</a>&nbsp&nbsp&nbsp&nbsp
+                                {% endfor %}
+                              </p>
+                              <p class="card-text">
+                                {{ task.about|truncatewords:20 }}
+                              </p>
+                              <p class="card-text">
+                                  {% for employee in task.employee.all %}
+                                    <a class="text-muted" href="{% url 'kanban_employee_page' employee.id %}">{{ employee }}</a>&nbsp&nbsp&nbsp&nbsp
+                                  {% endfor %}
+                              </p>
+                              <div class="btn-group" role="group" aria-label="First group">
+                                  <button type="button" class="btn btn-outline-secondary">
+                                    <i class="tf-icons bx bx-bulb"></i>
+                                  </button>
+                                  <button type="button" class="btn btn-outline-secondary">
+                                    <i class="tf-icons bx bx-comment-dots"></i>
+                                  </button>
+                                  <button type="button" class="btn btn-outline-secondary">
+                                    <i class="tf-icons bx bx-task"></i>
+                                  </button>
+                                  <button type="button" class="btn btn-outline-secondary">
+                                    <i class="tf-icons bx bx-rocket"></i>
+                                  </button>
+                              </div>
+                                <p></p>
+                                <button type="button" class="btn btn-sm btn-primary">Редактировать</button>
+                                <button type="button" class="btn btn-sm btn-primary">Удалить</button>
+                            </div>
+                          </div>
+                    </div>
+                      {% endfor %}
+                    {% endfor %}
+
+                  </div>
+                </div>
+                <!-- DoneCol -->
+                <div class="col-md-6 col-lg-3">
+                  <h5 class="mt-2">На проверке</h5>
+                  <div class="accordion mt-4 accordion-without-arrow" id="done">
+
+                    {% for date, tasks in done.items %}
+                      <h6 class="mt-2 text-muted">{{ date }}</h6>
+                      {% for task in tasks %}
+                        <div class="card accordion-item">
+                          <h2 class="accordion-header text-body d-flex justify-content-between" id="heading{{ task.pk }}">
+                            <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#accordion{{ task.pk }}" aria-expanded="false" aria-controls="accordion{{ task.pk }}">
+                              {{ task.name }}
+                              {% if task.priority == 3 %}
+                                <span class="badge badge-center bg-success">3</span>
+                              {% elif task.priority == 2 %}
+                                <span class="badge badge-center bg-warning">2</span>
+                              {% elif task.priority == 1 %}
+                                <span class="badge badge-center bg-danger">1</span>
+                              {% endif %}
+                            </button>
+                          </h2>
+                          <div id="accordion{{ task.pk }}" class="accordion-collapse collapse" data-bs-parent="#done" style="">
+                            <div class="accordion-body">
+                              <p class="card-text">
+                                {% for project in task.project.all %}
+                                  <a class="text-muted" href="{% url 'kanban_project_page' project.id %}">{{ project }}</a>&nbsp&nbsp&nbsp&nbsp
+                                {% endfor %}
+                              </p>
+                              <p class="card-text">
+                                {{ task.about|truncatewords:20 }}
+                              </p>
+                              <p class="card-text">
+                                  {% for employee in task.employee.all %}
+                                    <a class="text-muted" href="{% url 'kanban_employee_page' employee.id %}">{{ employee }}</a>&nbsp&nbsp&nbsp&nbsp
+                                  {% endfor %}
+                              </p>
+                              <div class="btn-group" role="group" aria-label="First group">
+                                  <button type="button" class="btn btn-outline-secondary">
+                                    <i class="tf-icons bx bx-bulb"></i>
+                                  </button>
+                                  <button type="button" class="btn btn-outline-secondary">
+                                    <i class="tf-icons bx bx-comment-dots"></i>
+                                  </button>
+                                  <button type="button" class="btn btn-outline-secondary">
+                                    <i class="tf-icons bx bx-task"></i>
+                                  </button>
+                                  <button type="button" class="btn btn-outline-secondary">
+                                    <i class="tf-icons bx bx-rocket"></i>
+                                  </button>
+                              </div>
+                                <p></p>
+                                <button type="button" class="btn btn-sm btn-primary">Редактировать</button>
+                                <button type="button" class="btn btn-sm btn-primary">Удалить</button>
+                            </div>
+                          </div>
+                    </div>
+                      {% endfor %}
+                    {% endfor %}
+
+                  </div>
+                </div>
+                <!-- ReleaseCol -->
+                <div class="col-md-6 col-lg-3">
+                  <h5 class="mt-2">Завершено</h5>
+                  <div class="accordion mt-4 accordion-without-arrow" id="release">
+
+                    {% for date, tasks in release.items %}
+                      <h6 class="mt-2 text-muted">{{ date }}</h6>
+                      {% for task in tasks %}
+                        <div class="card accordion-item">
+                          <h2 class="accordion-header text-body d-flex justify-content-between" id="heading{{ task.pk }}">
+                            <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#accordion{{ task.pk }}" aria-expanded="false" aria-controls="accordion{{ task.pk }}">
+                              {{ task.name }}
+                              {% if task.priority == 3 %}
+                                <span class="badge badge-center bg-success">3</span>
+                              {% elif task.priority == 2 %}
+                                <span class="badge badge-center bg-warning">2</span>
+                              {% elif task.priority == 1 %}
+                                <span class="badge badge-center bg-danger">1</span>
+                              {% endif %}
+                            </button>
+                          </h2>
+                          <div id="accordion{{ task.pk }}" class="accordion-collapse collapse" data-bs-parent="#release" style="">
+                            <div class="accordion-body">
+                              <p class="card-text">
+                                {% for project in task.project.all %}
+                                  <a class="text-muted" href="{% url 'kanban_project_page' project.id %}">{{ project }}</a>&nbsp&nbsp&nbsp&nbsp
+                                {% endfor %}
+                              </p>
+                              <p class="card-text">
+                                {{ task.about|truncatewords:20 }}
+                              </p>
+                              <p class="card-text">
+                                  {% for employee in task.employee.all %}
+                                    <a class="text-muted" href="{% url 'kanban_employee_page' employee.id %}">{{ employee }}</a>&nbsp&nbsp&nbsp&nbsp
+                                  {% endfor %}
+                              </p>
+                              <div class="btn-group" role="group" aria-label="First group">
+                                  <button type="button" class="btn btn-outline-secondary">
+                                    <i class="tf-icons bx bx-bulb"></i>
+                                  </button>
+                                  <button type="button" class="btn btn-outline-secondary">
+                                    <i class="tf-icons bx bx-comment-dots"></i>
+                                  </button>
+                                  <button type="button" class="btn btn-outline-secondary">
+                                    <i class="tf-icons bx bx-task"></i>
+                                  </button>
+                                  <button type="button" class="btn btn-outline-secondary">
+                                    <i class="tf-icons bx bx-rocket"></i>
+                                  </button>
+                              </div>
+                                <p></p>
+                                <button type="button" class="btn btn-sm btn-primary">Редактировать</button>
+                                <button type="button" class="btn btn-sm btn-primary">Удалить</button>
+                            </div>
+                          </div>
+                    </div>
+                      {% endfor %}
+                    {% endfor %}
+
+                  </div>
+                </div>
+
+              </div>
+
+              <!--/ Content types -->
+
+            </div>
+            <!-- / Content -->
+
+            <!-- Footer -->
+            <footer class="content-footer footer bg-footer-theme">
+              <div class="container-xxl d-flex flex-wrap justify-content-between py-2 flex-md-row flex-column">
+                <div class="mb-2 mb-md-0">
+                  ©
+                  <script>
+                    document.write(new Date().getFullYear());
+                  </script>
+                  , made with ❤️ by
+                  <a href="https://themeselection.com" target="_blank" class="footer-link fw-bolder">ThemeSelection</a>
+                </div>
+                <div>
+                  <a href="https://themeselection.com/license/" class="footer-link me-4" target="_blank">License</a>
+                  <a href="https://themeselection.com/" target="_blank" class="footer-link me-4">More Themes</a>
+
+                  <a
+                    href="https://themeselection.com/demo/sneat-bootstrap-html-admin-template/documentation/"
+                    target="_blank"
+                    class="footer-link me-4"
+                    >Documentation</a
+                  >
+
+                  <a
+                    href="https://github.com/themeselection/sneat-html-admin-template-free/issues"
+                    target="_blank"
+                    class="footer-link me-4"
+                    >Support</a
+                  >
+                </div>
+              </div>
+            </footer>
+            <!-- / Footer -->
+
+            <div class="content-backdrop fade"></div>
+          </div>
+          <!-- Content wrapper -->
+        </div>
+        <!-- / Layout page -->
+      </div>
+
+      <!-- Overlay -->
+      <div class="layout-overlay layout-menu-toggle"></div>
+    </div>
+    <!-- / Layout wrapper -->
+
+{% endblock content %}
