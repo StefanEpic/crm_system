@@ -16,8 +16,10 @@ class Department(models.Model):
 
 
 class Employee(AbstractUser):
+    last_name = models.CharField('Фамилия', max_length=255, blank=True, null=True)
+    first_name = models.CharField('Имя', max_length=255, blank=True, null=True)
     second_name = models.CharField('Отчество', max_length=255, blank=True, null=True)
-    departament = models.ForeignKey(Department, on_delete=models.CASCADE, verbose_name='Отдел', blank=True,  null=True)
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, verbose_name='Отдел', blank=True,  null=True)
     photo = models.ImageField(upload_to='photos_of_employees/%Y/%m/%d/', blank=True, verbose_name='Фотография')
 
     class Meta:
@@ -32,8 +34,7 @@ class Employee(AbstractUser):
 
 class Project(models.Model):
     name = models.CharField(max_length=255, verbose_name='Объект')
-    about = models.TextField(verbose_name='Описание')
-    manager = models.ForeignKey(Employee, on_delete=models.CASCADE, verbose_name='Комплексный ГИП')
+    about = models.TextField(verbose_name='Описание', blank=True)
 
     class Meta:
         verbose_name = 'Объект'
