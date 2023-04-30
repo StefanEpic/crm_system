@@ -27,6 +27,31 @@
       <!-- Layout container -->
       <div class="layout-page">
 
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+          <div class="container-fluid">
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+              <div class="navbar-nav me-auto mb-2 mb-lg-0">
+                <div class="avatar">
+                  {% if user.photo %}
+                    <img src="{{ MEDIA_DIR }}{{ user.photo.url }}" class="w-px-40 h-auto rounded-circle">
+                  {% else %}
+                    <img src="/media/photos_of_employees/default.png" class="w-px-40 h-auto rounded-circle">
+                  {% endif %}
+                </div>
+                <a href="{% url 'profile' user.id %}" class="nav-item nav-link">{{ user }}</a>
+              </div>
+              <div>
+                <a href="{% url 'logout' %}" class="btn btn-sm btn-outline-danger"><i class="bx bx-log-out-circle"></i> Выход</a>
+              </div>
+            </div>
+          </div>
+        </nav>
+
         <!-- Content wrapper -->
         <div class="content-wrapper">
           <!-- Content -->
@@ -34,7 +59,7 @@
           <div class="container-xxl flex-grow-1 container-p-y">
 
             <!-- Nav -->
-            <h4 class="fw-bold"><span class="text-muted fw-light"><a class="text-muted fw-light" href="/">ИТИС</a></span>{% if page_title %} / {{ page_title }}{% endif %}</h4>
+            <h4 class="fw-bold"><span class="text-muted fw-light"><a class="text-muted fw-light" href="/">Главная</a></span>{% if page_title %} / {{ page_title }}{% endif %}</h4>
 
             <div class="container-fluid d-flex flex-md-row flex-column justify-content-between align-items-md-center gap-1 container-p-x mb-4">
               <div class="demo-inline-spacing">
@@ -74,19 +99,6 @@
 
           </div>
           <!-- / Content -->
-
-          <!-- Footer -->
-          <footer class="footer bg-light">
-            <div class="container-fluid d-flex flex-md-row flex-column justify-content-between align-items-md-center gap-1 container-p-x py-3">
-              <div>
-                <a href="{% url 'personal_page' user.id %}" class="footer-text fw-bolder">{{ user }}</a>
-              </div>
-              <div>
-                <a href="{% url 'account_logout' %}" class="btn btn-sm btn-outline-danger"><i class="bx bx-log-out-circle"></i> Выход</a>
-              </div>
-            </div>
-          </footer>
-          <!-- Footer -->
 
           <div class="content-backdrop fade"></div>
         </div>

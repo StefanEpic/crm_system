@@ -2,9 +2,10 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 
 
 class TestIsAuthorThisTask(UserPassesTestMixin):
-
+    # Is user task author or in group Management
     def test_func(self):
-        return self.get_object().author_id == self.request.user.pk
+        user = self.requset.user
+        return self.get_object().author_id == user.pk or user.groups.filter(name='Управление').exists()
 
 
 def do_dict(tasks):

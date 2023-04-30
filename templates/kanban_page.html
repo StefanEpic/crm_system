@@ -55,6 +55,7 @@
                   {% endfor %}
                   </ul>
                 </p>
+                {% if task.author_id == user_pk or is_manager %}
                 <div class="demo inline-spacing">
                   <button type="button" class="btn btn-sm btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                     {% if task.status == 'TD' %}
@@ -74,11 +75,10 @@
                     <li><a class="dropdown-item" href="{% url 'transfer_to_release' task.pk %}">Завершено</a></li>
                   </ul>
                 </div>
-                {% if task.author_id == user_pk %}
-                  <div class="demo-inline-spacing">
-                    <button type="button" class="btn btn-sm btn-primary" onclick="document.location='http://127.0.0.1:8000/{{ task.pk }}/edit'">Редактировать</button>
-                    <button type="button" class="btn btn-sm btn-primary" onclick="document.location='http://127.0.0.1:8000/{{ task.pk }}/delete'">Удалить</button>
-                  </div>
+                <div class="demo-inline-spacing">
+                  <button type="button" class="btn btn-sm btn-primary" onclick="document.location='http://127.0.0.1:8000/{{ task.pk }}/edit'">Редактировать</button>
+                  <button type="button" class="btn btn-sm btn-primary" onclick="document.location='http://127.0.0.1:8000/{{ task.pk }}/delete'">Удалить</button>
+                </div>
                 {% endif %}
               </div>
             </div>

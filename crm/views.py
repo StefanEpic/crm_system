@@ -1,9 +1,9 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, redirect
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse_lazy
 from django.views.generic import TemplateView, UpdateView, DeleteView, CreateView
 
-from .forms import TaskForm, PersonalForm
+from .forms import TaskForm, ProfileForm
 from .models import Task, Project, Employee, Department
 from .utils import do_dict, TestIsAuthorThisTask
 
@@ -30,6 +30,7 @@ class KanbanView(LoginRequiredMixin, TemplateView):
 
         context['columns'] = columns
         context['user_pk'] = self.request.user.pk
+        context['is_manager'] = self.request.user.groups.filter(name='Управление').exists()
         context['projects'] = Project.objects.all()
         context['employees'] = Employee.objects.exclude(id=1)
         context['departments'] = Department.objects.all()
@@ -58,6 +59,7 @@ class ProjectView(LoginRequiredMixin, TemplateView):
 
         context['columns'] = columns
         context['user_pk'] = self.request.user.pk
+        context['is_manager'] = self.request.user.groups.filter(name='Управление').exists()
         context['projects'] = Project.objects.all()
         context['employees'] = Employee.objects.exclude(id=1)
         context['departments'] = Department.objects.all()
@@ -88,6 +90,7 @@ class EmployeeView(LoginRequiredMixin, TemplateView):
 
         context['columns'] = columns
         context['user_pk'] = self.request.user.pk
+        context['is_manager'] = self.request.user.groups.filter(name='Управление').exists()
         context['projects'] = Project.objects.all()
         context['employees'] = Employee.objects.exclude(id=1)
         context['departments'] = Department.objects.all()
@@ -108,7 +111,8 @@ class DepartmentView(LoginRequiredMixin, TemplateView):
         todo = do_dict(task.objects.filter(status='TD', employee__in=employees).distinct().order_by('end', 'priority'))
         doing = do_dict(task.objects.filter(status='DO', employee__in=employees).distinct().order_by('end', 'priority'))
         done = do_dict(task.objects.filter(status='DN', employee__in=employees).distinct().order_by('end', 'priority'))
-        release = do_dict(task.objects.filter(status='RL', employee__in=employees).distinct().order_by('end', 'priority'))
+        release = do_dict(
+            task.objects.filter(status='RL', employee__in=employees).distinct().order_by('end', 'priority'))
 
         columns = (
             {'label': 'Запланировано', 'tag': 'todo', 'objects': todo},
@@ -119,6 +123,7 @@ class DepartmentView(LoginRequiredMixin, TemplateView):
 
         context['columns'] = columns
         context['user_pk'] = self.request.user.pk
+        context['is_manager'] = self.request.user.groups.filter(name='Управление').exists()
         context['projects'] = Project.objects.all()
         context['employees'] = Employee.objects.exclude(id=1)
         context['departments'] = Department.objects.all()
@@ -202,10 +207,10 @@ class TaskDelete(LoginRequiredMixin, TestIsAuthorThisTask, DeleteView):
         return self.delete(request, *args, **kwargs)
 
 
-class PersonalView(LoginRequiredMixin, UpdateView):
-    form_class = PersonalForm
+class ProfileView(LoginRequiredMixin, UpdateView):
+    form_class = ProfileForm
     model = Employee
-    template_name = 'personal.html'
+    template_name = 'profile/profile.html'
     success_url = reverse_lazy('kanban_page')
 
     def get_context_data(self, **kwargs):

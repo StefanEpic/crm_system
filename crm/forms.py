@@ -1,4 +1,6 @@
 from django import forms
+from django.contrib.auth.forms import UserCreationForm
+
 from .models import Task, Employee
 
 
@@ -15,8 +17,10 @@ class TaskForm(forms.ModelForm):
             'end',
         ]
 
+    employee = forms.ModelMultipleChoiceField(queryset=Employee.objects.exclude(id=1))
 
-class PersonalForm(forms.ModelForm):
+
+class ProfileForm(forms.ModelForm):
     class Meta:
         model = Employee
         fields = [
@@ -28,3 +32,11 @@ class PersonalForm(forms.ModelForm):
             'department',
             'photo',
         ]
+
+
+class UserRegisterForm(UserCreationForm):
+    email = forms.EmailField()
+
+    class Meta:
+        model = Employee
+        fields = ['username', 'email', 'password1', 'password2']

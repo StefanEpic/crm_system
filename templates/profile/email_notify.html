@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Уведомление</title>
+</head>
+<body>
+    <h2>{{ label }} <a href="http://127.0.0.1:8000/">"{{ name }}"</a></h2>
+    <hr>
+    <p><h3>Проект:</h3></p>
+    <p><h4>{{ project }}</h4></p>
+    <p><h3>Статус:</h3></p>
+    <p><h4>
+        {% if status == 'TD' %}
+          Запланировано
+        {% elif status == 'DO' %}
+          В работе
+        {% elif status == 'DN' %}
+          На проверке
+        {% elif status == 'RL' %}
+          Завершено
+        {% endif %}
+    </h4></p>
+    <p><h3>Срок:</h3></p>
+    <p><h4>{{ end }}</h4></p>
+    <p><h3>Описание задачи:</h3></p>
+    <p><h4>{{ about }}</h4></p>
+</body>
+</html>
