@@ -1,10 +1,13 @@
 from django import forms
+from django.conf import settings
 from django.contrib.auth.forms import UserCreationForm
 
 from .models import Task, Employee
 
 
 class TaskForm(forms.ModelForm):
+    employee = forms.ModelMultipleChoiceField(queryset=Employee.objects.exclude(id=1))
+
     class Meta:
         model = Task
         fields = [
@@ -16,8 +19,6 @@ class TaskForm(forms.ModelForm):
             'priority',
             'end',
         ]
-
-    employee = forms.ModelMultipleChoiceField(queryset=Employee.objects.exclude(id=1))
 
 
 class ProfileForm(forms.ModelForm):
